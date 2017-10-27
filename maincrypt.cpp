@@ -1,0 +1,84 @@
+#include "maincrypt.h"
+#include "ui_maincrypt.h"
+#include "crypt_class.h"
+#include "RSA_key.h"
+
+QString MainCrypt::encrypted;
+
+MainCrypt::MainCrypt(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainCrypt)
+{
+    ui->setupUi(this);
+    QString source;
+    source = ui->textEdit_3->toPlainText();
+
+      // private key
+      const char *b64priv_key = "-----BEGIN RSA PRIVATE KEY-----\n"
+              "MIIEowIBAAKCAQEAys9sBpLudy3eS9AMtENzql2QnfMpLN8fn3clz9hYT1LIY4/z\n"
+              "jD65GSLrgWcLc1AyL5+SXMwCX26iDp0ODsTggCLR1xZDypkv89IQb5y7k6qNeOwh\n"
+              "AgfgIbFO7nrBgfVKA3bif00zDMaDPjuZCg1CAmx2kF3Hv4IRkYrma+laI8Q6lCXL\n"
+              "zYQ6MPvUD5U+41jKZMoTYr6QIgTjm1SYvy+vG+jTKb6aP8cnDfPiMu7Z8IkA4Mpd\n"
+              "xhkN/tBs7vHeXMxfw79P+zjb1X9ns343YcvVvTgFAabc6dMj5ZZs5DoZikpAb/Z1\n"
+              "66K7LSXsHjXgZ59mv3wxp8yGTAlUrZmDRVfVwwIDAQABAoIBABHOaFOjbuBz3IKX\n"
+              "f6YMDgm1MU9M3B6ecG5VzbIT8pz0TbfAGcgEccftMvQnke/L6LwZrIYNO2AZnIzf\n"
+              "6S4Oxw84/2d9AvK0xGsJ1HuYLTfnz4gAY12ER39ty9pQWNEKMjdfpr86jfLfMwKx\n"
+              "xNwHEfaYg0hlk3YS+2vl4Bk1Yb6mAdgH/XxGEt0KVNh2wsCR8dabOqzq7pqt7Qv9\n"
+              "S9xUlfUu2ZETqhANfhBW0AcyIpKQI3gmI2DqT/M/YCNYu+1fh7l3QToHkKPUaU8U\n"
+              "ivRnMb8QOWoQYO2IDrMn3oYoX+xeE/0sNh8NAFb/D50eBBK61VViWVI/DZHmp4mK\n"
+              "Tqbf7oECgYEA7v7YoUNRmDP4vzLPsZNPrAyB7Nl1Z/ZGjJaH34C7N8vpcDY9tOBP\n"
+              "+vHH4tuSAHOitP3fep6JZD4zZa3iWnXBWrhARi3bzLzEJJcJNCFXca5D0vnXNtiv\n"
+              "0AjF6wVgfAs/XRiOZwQ1lceA1fI/h1ZtSsm+F5Mch7OCgrc40LgLziECgYEA2T17\n"
+              "5ytGKHqZ0kTPBNg8Q8gVjU2vgcrocLz57tPVzJEvZzm+gnAf9xWjIJ63+hzyISmW\n"
+              "G+C+37HfWNFwXAizxNhJy+ciCM5LznqbLyqlxNvhOJox7eELStJKEgT7sQoIHR+x\n"
+              "8cA5eZLfyYz3/FCwMXvaGYU7hpsvpKmBKs1tP2MCgYARNXqFyiIi8oMTyWXZJIFV\n"
+              "IyVr15CzprEXyHMKLevNLbqmYNF6p7g6mpRJCoRt0eXCYJFp8+ZyuGPdC3NEDjyY\n"
+              "+rFuHDk6edEpzVJVVZ1FS0YI+AJ+KYYnVapirOVwqSKr4mvGkTAGk/H79dCLPzbp\n"
+              "brNoYShpwQxBu021Abuf4QKBgQCgeYa5sYHWDRrr9OBoV8PM3lTtWOG5I0apYS/P\n"
+              "eLSKtQUrX8CXYnR6dYVXZ2fIXvGOBcZZOaBGZoLyfWRe2B7T3mJFOawujRX6pR9V\n"
+              "rE9gKH0q7tzLOF67GrSUsxGqKhrsSKmOR80tPY4KuRPHU2OUakUmbQEX4jNDk+NS\n"
+              "1wVIuQKBgENjUJp/sGchm38Y+T/Hg/h3+bSS3MS5kXeN+IkGAABA9VVujeA2eIfq\n"
+              "faCw5m8B0G/ctjMyK80oK3JDPFxDIwMRjxXB9WoLT1FkPbMxjGWMKnwY5ng+CgsX\n"
+              "m/QrvzQbhC/Rgmh3hJ4203wwKZOTTaMDMnS3cBIiX/qlWegERo2x\n"
+              "-----END RSA PRIVATE KEY-----\n";
+
+
+      // LOAD PUBLIC KEY
+      crypt_class::rsaPubKey = crypt_class::loadPUBLICKeyFromString( source.toStdString().c_str() ) ;
+      // LOADR PRIVATE KEY
+      crypt_class::rsaPrivKey = crypt_class::loadPRIVATEKeyFromString( b64priv_key ) ;
+
+
+      // RSA encryption with public key
+}
+
+MainCrypt::~MainCrypt()
+{
+    delete ui;
+}
+
+/**
+ * @brief MainCrypt::on_pushButton_clicked
+ * шифруем содержимое textedit
+ */
+void MainCrypt::on_pushButton_clicked()
+{
+
+    QString message = ui->textEdit->toPlainText();
+    //зашифровываем данные
+    MainCrypt::encrypted = crypt_class::rsaEncrypt( crypt_class::rsaPubKey, message);
+       ui->textEdit_2->setText(MainCrypt::encrypted);
+       //расшифровываем данные
+
+}
+
+/**
+ * @brief MainCrypt::on_pushButton_2_clicked
+ * расшифровываем содержимое текстового поля textedit 2
+ */
+void MainCrypt::on_pushButton_2_clicked()
+{
+    MainCrypt::encrypted = ui->textEdit_2->toPlainText();
+    QString  data2 = crypt_class::rsaDecrypt(crypt_class::rsaPrivKey, encrypted);
+    ui->textEdit_4->setText(data2.toStdString().c_str());
+}
