@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QJsonDocument>
 #include <QJsonObject>
+
 #include <openssl/crypto.h>
 #include <openssl/rsa.h>
 #include <openssl/ssl.h>
@@ -26,6 +27,8 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
 
 private:
     Ui::MainCrypt *ui;

@@ -75,7 +75,7 @@ QString crypt_class::rsaEncrypt(RSA *pubKey, QString str)
   while (size>0){
          if( size>str_size_to_crypt){element = str.mid(cyc*str_size_to_crypt, str_size_to_crypt);}else{element = str.mid(cyc*str_size_to_crypt, str.length());}
          RSA_public_encrypt( RSA_size(pubKey)-11, (const unsigned char*)element.toStdString().c_str(), tmp, pubKey, RSA_PKCS1_PADDING );
-         binary = new QByteArray((char*)tmp,256);
+         binary = new QByteArray((char*)tmp,RSA_size(pubKey));
          size -= str_size_to_crypt;
          tempar.append(*binary);
          delete binary;
