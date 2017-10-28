@@ -5,63 +5,6 @@ RSA_key::RSA_key()
 
 }
 
-QJsonObject RSA_key::open_rsa()
-{
-    ///.... //--------------------------------------------------------------------------------------------
-    //проверяем наличие текстового, конфигурационного файла
-    bool nokey=false;
-    QJsonObject key_data;
-    QString str;
-    QFile file;
-      file.setFileName("RSA_public.key");
-      if(QFileInfo::exists("RSA_public.key")){if(file.open(QIODevice::ReadOnly |QIODevice::Text)){
-           str = file.readAll();
-           key_data["public"] = str;
-           file.close();
-       }}else{nokey=true;}
-    file.setFileName("RSA_private.key");
-       if(QFileInfo::exists("RSA_private.key")){if(file.open(QIODevice::ReadOnly |QIODevice::Text)){
-               str = file.readAll();
-            key_data["private"] = str;
-            file.close();
-       }}else{nokey=true;}
-    file.setFileName("RSA_server_public.key");
-       if(QFileInfo::exists("RSA_server_public.key")){if(file.open(QIODevice::ReadOnly |QIODevice::Text)){
-               str = file.readAll();
-           key_data["server_public"] = str;
-           file.close();
-       }}else{key_data["server_public"] = "none";}
-    file.setFileName("PERSONAL_UID.key");
-        if(QFileInfo::exists("PERSONAL_UID.key")){if(file.open(QIODevice::ReadOnly |QIODevice::Text)){
-                str = file.readAll();
-            key_data["uid"] = str;
-            file.close();
-        }}else{key_data["uid"] = "none";}
-
-       if(nokey)
-       {
-           QJsonObject new_keys = RSA_key::Key_Gen();
-           file.setFileName("RSA_public.key");
-           if(file.open(QIODevice::WriteOnly)){
-                   QTextStream writeStream(&file);
-                   writeStream.setCodec("UTF8");
-                   writeStream << QString(new_keys.value("public").toString());
-                   file.close();
-           }
-           file.setFileName("RSA_private.key");
-           if(file.open(QIODevice::WriteOnly)){
-                   QTextStream writeStream(&file);
-                   writeStream.setCodec("UTF8");
-                   writeStream << QString(new_keys.value("private").toString());
-                   file.close();
-           }
-           key_data=new_keys;
-           key_data["server_public"] = "none";
-       }
-       return key_data;
-
-}
-
 QJsonObject RSA_key::Key_Gen()
 {
     QJsonObject keys;
@@ -119,20 +62,10 @@ QJsonObject RSA_key::Key_Gen()
             cert=QSslCertificate(crt);
             ok=cert.isBlacklisted();
         }
-
         ok=isPrivateKeyCorrespondsToCertificate(cert,pkey);
 
-
-        str_private = pkey.toPem().toStdString().c_str();
-        tmp = str_private.left(str_private.length()-31);
-        str_private=tmp.right(tmp.length()-32);
-
-        str_public = cert.toPem().toStdString().c_str();
-        tmp = str_public.left(str_public.length()-31);
-        str_public=tmp.right(tmp.length()-32);
-
-        keys["public"] =str_public;
-        keys["private"] = str_private;
+        keys["public"] =cert.publicKey().toPem().toStdString().c_str();
+        keys["private"] = pkey.toPem().toStdString().c_str();
         return keys;
 }
 

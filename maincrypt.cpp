@@ -43,6 +43,10 @@ void MainCrypt::on_pushButton_2_clicked()
     ui->textEdit_4->setText(data2.toStdString().c_str());
 }
 
+/**
+ * @brief MainCrypt::on_pushButton_3_clicked
+ * Загружаем ключи
+ */
 void MainCrypt::on_pushButton_3_clicked()
 {
     QString pub_key,priv_key;
@@ -52,4 +56,15 @@ void MainCrypt::on_pushButton_3_clicked()
       crypt_class::rsaPubKey = crypt_class::loadPUBLICKeyFromString( pub_key.toStdString().c_str() ) ;
       // LOADR PRIVATE KEY
       crypt_class::rsaPrivKey = crypt_class::loadPRIVATEKeyFromString( priv_key.toStdString().c_str()  ) ;
+}
+
+/**
+ * @brief MainCrypt::on_pushButton_4_clicked
+ * Генерируем ключи
+ */
+void MainCrypt::on_pushButton_4_clicked()
+{
+QJsonObject keys = RSA_key::Key_Gen();
+ui->textEdit_3->setText(keys["public"].toString());
+ui->textEdit_5->setText(keys["private"].toString());
 }

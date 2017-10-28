@@ -82,7 +82,6 @@ QString crypt_class::rsaEncrypt(RSA *pubKey, QString str)
          cyc++;
  }
   free(tmp);
-qDebug() << "size: "<< str.length()<<" bin size: " << tempar.length() <<" target: " << str.length()/122 << " get: " << cyc;
   return tempar.toHex();
 }
 
